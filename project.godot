@@ -14,3 +14,10 @@ config/name="Mimo"
 run/main_scene="res://world.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
 config/icon="res://icon.svg"
+
+[shader_globals]
+
+fader_position={
+"type": "vec3",
+"value": Vector3(1, 1, 2.08165e-12)
+}

@@ -1,0 +1,161 @@
+[gd_resource type="VisualShader" load_steps=18 format=3 uid="uid://c4sojepnurune"]
+
+[ext_resource type="Texture2D" uid="uid://dxvxyi7wbo4r4" path="res://addons/kenney_prototype_textures/orange/texture_01.png" id="1_e5xk2"]
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_7gkfw"]
+input_name = "inv_view_matrix"
+
+[sub_resource type="VisualShaderNodeTransformVecMult" id="VisualShaderNodeTransformVecMult_0ebgp"]
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_ny6f6"]
+default_input_values = [0, 0.0, 1, 5.0]
+operator = 5
+
+[sub_resource type="VisualShaderNodeFloatParameter" id="VisualShaderNodeFloatParameter_pe8gh"]
+parameter_name = "fader_size"
+default_value_enabled = true
+default_value = 5.0
+
+[sub_resource type="VisualShaderNodeFloatParameter" id="VisualShaderNodeFloatParameter_2gmir"]
+parameter_name = "fader_sharpness"
+default_value_enabled = true
+default_value = 10.0
+
+[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_7536b"]
+parameter_name = "Albedo"
+
+[sub_resource type="VisualShaderNodeComment" id="VisualShaderNodeComment_ccl1e"]
+size = Vector2(1392.64, 667.396)
+title = "Get world position of pixel"
+
+[sub_resource type="VisualShaderNodeComment" id="VisualShaderNodeComment_wyits"]
+size = Vector2(710.04, 523.393)
+title = "Position of fader updated in script"
+
+[sub_resource type="VisualShaderNodeComment" id="VisualShaderNodeComment_dbmgu"]
+size = Vector2(1007.12, 645.852)
+title = "Divide by size to get 0-1 range"
+
+[sub_resource type="VisualShaderNodeComment" id="VisualShaderNodeComment_5oomg"]
+size = Vector2(1017.49, 733.737)
+title = "Raise to a power to sharpen dropoff"
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_8cdxo"]
+source = 5
+texture = ExtResource("1_e5xk2")
+
+[sub_resource type="VisualShaderNodeVec3Parameter" id="VisualShaderNodeVec3Parameter_q6icf"]
+parameter_name = "fader_position"
+qualifier = 1
+
+[sub_resource type="VisualShaderNodeVectorDistance" id="VisualShaderNodeVectorDistance_xnyf3"]
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_c35wx"]
+default_input_values = [0, 0.0, 1, 10.0]
+operator = 3
+
+[sub_resource type="VisualShaderNodeFloatFunc" id="VisualShaderNodeFloatFunc_emee1"]
+function = 18
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_omyda"]
+input_name = "vertex"
+
+[resource]
+code = "shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_lambert, specular_schlick_ggx;
+
+uniform sampler2D Albedo;
+global uniform vec3 fader_position;
+uniform float fader_size = 5;
+uniform float fader_sharpness = 10;
+
+
+
+void fragment() {
+	vec4 n_out2p0;
+// Texture2D:2
+	n_out2p0 = texture(Albedo, UV);
+
+
+// Vector3Parameter:3
+	vec3 n_out3p0 = fader_position;
+
+
+// Input:10
+	mat4 n_out10p0 = INV_VIEW_MATRIX;
+
+
+// Input:9
+	vec3 n_out9p0 = VERTEX;
+
+
+// TransformVectorMult:11
+	vec3 n_out11p0 = (n_out10p0 * vec4(n_out9p0, 1.0)).xyz;
+
+
+// Distance:5
+	float n_out5p0 = distance(n_out3p0, n_out11p0);
+
+
+// FloatParameter:13
+	float n_out13p0 = fader_size;
+
+
+// FloatOp:6
+	float n_out6p0 = n_out5p0 / n_out13p0;
+
+
+// FloatFunc:7
+	float n_out7p0 = min(max(n_out6p0, 0.0), 1.0);
+
+
+// FloatParameter:14
+	float n_out14p0 = fader_sharpness;
+
+
+// FloatOp:12
+	float n_out12p0 = pow(n_out7p0, n_out14p0);
+
+
+// Output:0
+	ALBEDO = vec3(n_out2p0.xyz);
+	ALPHA = n_out12p0;
+
+
+}
+"
+graph_offset = Vector2(-340.451, -93.3671)
+nodes/fragment/0/position = Vector2(1160, 120)
+nodes/fragment/2/node = SubResource("VisualShaderNodeTexture_8cdxo")
+nodes/fragment/2/position = Vector2(-900, -340)
+nodes/fragment/3/node = SubResource("VisualShaderNodeVec3Parameter_q6icf")
+nodes/fragment/3/position = Vector2(-2460, 80)
+nodes/fragment/5/node = SubResource("VisualShaderNodeVectorDistance_xnyf3")
+nodes/fragment/5/position = Vector2(-1320, 340)
+nodes/fragment/6/node = SubResource("VisualShaderNodeFloatOp_c35wx")
+nodes/fragment/6/position = Vector2(-760, 880)
+nodes/fragment/7/node = SubResource("VisualShaderNodeFloatFunc_emee1")
+nodes/fragment/7/position = Vector2(-380, 380)
+nodes/fragment/9/node = SubResource("VisualShaderNodeInput_omyda")
+nodes/fragment/9/position = Vector2(-2840, 1080)
+nodes/fragment/10/node = SubResource("VisualShaderNodeInput_7gkfw")
+nodes/fragment/10/position = Vector2(-2820, 800)
+nodes/fragment/11/node = SubResource("VisualShaderNodeTransformVecMult_0ebgp")
+nodes/fragment/11/position = Vector2(-2140, 920)
+nodes/fragment/12/node = SubResource("VisualShaderNodeFloatOp_ny6f6")
+nodes/fragment/12/position = Vector2(780, 340)
+nodes/fragment/13/node = SubResource("VisualShaderNodeFloatParameter_pe8gh")
+nodes/fragment/13/position = Vector2(-1380, 900)
+nodes/fragment/14/node = SubResource("VisualShaderNodeFloatParameter_2gmir")
+nodes/fragment/14/position = Vector2(200, 600)
+nodes/fragment/15/node = SubResource("VisualShaderNodeTexture2DParameter_7536b")
+nodes/fragment/15/position = Vector2(-1600, -680)
+nodes/fragment/16/node = SubResource("VisualShaderNodeComment_ccl1e")
+nodes/fragment/16/position = Vector2(-2940, 680)
+nodes/fragment/17/node = SubResource("VisualShaderNodeComment_wyits")
+nodes/fragment/17/position = Vector2(-2573.26, -100.548)
+nodes/fragment/18/node = SubResource("VisualShaderNodeComment_dbmgu")
+nodes/fragment/18/position = Vector2(-1440, 760)
+nodes/fragment/19/node = SubResource("VisualShaderNodeComment_5oomg")
+nodes/fragment/19/position = Vector2(53.1518, 291.276)
+nodes/fragment/connections = PackedInt32Array(3, 0, 5, 0, 2, 0, 0, 0, 5, 0, 6, 0, 6, 0, 7, 0, 9, 0, 11, 1, 10, 0, 11, 0, 11, 0, 5, 1, 7, 0, 12, 0, 12, 0, 0, 1, 13, 0, 6, 1, 14, 0, 12, 1, 15, 0, 2, 2)
